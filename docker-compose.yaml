@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  r_ball_1:
+    build: 
+      context: r_tennis
+    environment:
+      - WHOAMI=ball
+      - MYNUMBER=1
+      - VERBOSE=1
+    depends_on: 
+      - redis
+  r_player_1:
+    build: 
+      context: r_tennis
+    environment:
+      - WHOAMI=player
+      - MYNUMBER=1
+      - VERBOSE=1
+    depends_on: 
+      - redis
+  r_player_2:
+    build: 
+      context: r_tennis
+    environment:
+      - WHOAMI=player
+      - MYNUMBER=2
+      - VERBOSE=1
+    depends_on: 
+      - redis
+  redis:
+    image: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+  http_server:
+    build:
+      context: node_tennis
+    ports:
+      - "8000:8000"
+    depends_on: 
+      - redis
+    environment:
+      - NODE_PATH=/usr/local/lib/node_modules
