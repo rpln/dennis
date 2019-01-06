@@ -1,4 +1,4 @@
-from rocker/r-ver:3.5.1
+FROM rocker/r-ver:3.5.1
 
 RUN \
   apt-get update
@@ -6,9 +6,9 @@ RUN \
   apt-get install -y libhiredis-dev
 
 RUN \
-  install2.r redux jsonlite
+  install2.r redux jsonlite R6
 
 ADD \
-  tennis.r setup.r /
+  tennis.r setup.r ball.r /
 
 CMD Rscript tennis.r

@@ -32,7 +32,7 @@ io.on('connection', function(socket) {
   player_1_position = [0,0,0];
   player_2_position = [0,0,0];
   setInterval(function() {
-    client.get('ball.1.position', function(err, reply) {
+    client.get('ball.position', function(err, reply) {
         if (reply) {
             ball_position = JSON.parse(reply);
 		        io.emit('update_ball_position', ball_position);

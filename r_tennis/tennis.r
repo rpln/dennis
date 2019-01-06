@@ -2,24 +2,7 @@
 source("setup.r")
 
 if(whoami == "ball"){
-  if(verbose>=1) print("I'm a ball")
-  position <- c(0.33, 0, 0)
-  velocity <- c(0, 0, 0)
-  # acceleration <- c(0, 0, -0.01)
-  set(position)
-  set(velocity)
-  while(1){
-    velocity <- get(velocity)
-    # velocity <- velocity + acceleration
-    # if(position[3] < 0){
-    #   velocity[3] <- -velocity[3]
-    # }
-    # set(velocity)
-    position = position + velocity
-    position[3] <- 0.5-abs(position[2] - 0.5)
-    set(position)
-    Sys.sleep(sleeptime)
-  }
+  source("ball.r")
 }
 
 if(whoami == "player"){
@@ -27,10 +10,9 @@ if(whoami == "player"){
   
   position <- list(c(0.33, 0, 0), c(0.66, 1, 0))[[mynumber]]
   myoppositenumber <- 3 - mynumber
-  ballnumber <- 1
   velocity <- c(0, 0, 0)
   set(position)
-  while(!r$EXISTS("ball.1.position")){
+  while(!r$EXISTS("ball.position")){
     if(verbose>=1) print("Waiting for ball")
     Sys.sleep(1)
   }
@@ -49,7 +31,7 @@ if(whoami == "player"){
     # Can I hit a ball?
     if(
       dist_from_ball <- dist(
-        ball_position <- get(name = paste0("ball.", ballnumber, ".position")),
+        ball_position <- get(name = paste0("ball.position")),
         position
       )<0.1
     ){
@@ -74,7 +56,7 @@ if(whoami == "player"){
       #new_ball_velocity[1:2] <- new_ball_velocity[1:2] + rnorm(2)
       new_ball_velocity <- new_ball_velocity/sum(new_ball_velocity^2) # scale to speed=ball_speed
       new_ball_velocity <- ball_speed*new_ball_velocity
-      set(new_ball_velocity, name = paste0("ball.", ballnumber, ".velocity"))
+      set(new_ball_velocity, name = paste0("ball.velocity"))
       
     }else{
       # Go closer to ball
