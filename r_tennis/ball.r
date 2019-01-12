@@ -7,7 +7,7 @@ Ball <- R6Class("Ball",
         framerate = NULL,
         position = NULL,
         velocity = NULL,
-        initialize = function(redis_conn, framerate, position = c(0.33,0,0), velocity = c(0,0,0), verbose = 1){
+        initialize = function(redis_conn, framerate, position, velocity, verbose = 1){
             self$verbose = verbose
             if(verbose>=1) print("I'm a ball")
 
@@ -42,11 +42,11 @@ Ball <- R6Class("Ball",
     )
 )
 
-r <- redux::hiredis(host = "redis")
-framerate <- 300
 ball = Ball$new(
     redis_conn = redux::hiredis(host = "redis"),
     framerate = 300,
-    verbose = 1
+    verbose = as.numeric(Sys.getenv("VERBOSE")),
+    position = c(0.33,0,0),
+    velocity = c(0,0,0)
 )
 ball$move_continuously()
