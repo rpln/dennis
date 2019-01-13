@@ -1,6 +1,15 @@
 version: '3'
 
 services:
+  r_umpire:
+    build: 
+      context: r_tennis
+    environment:
+      - WHOAMI=umpire
+      - MYNUMBER=1
+      - VERBOSE=1
+    depends_on: 
+      - redis
   r_ball_1:
     build: 
       context: r_tennis

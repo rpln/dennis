@@ -12,11 +12,20 @@ Ball <- R6Class("Ball",
             if(verbose>=1) print("I'm a ball")
 
             self$r = redis_conn
+            for(i in list(c(0,0,0.1), c(0,1,0.1), c(1,1,0.1), c(1,0,0.1))){
+                self$set(i, "ball.position")
+                Sys.sleep(1)
+            }
             self$set(self$position <- position, "ball.position")
             self$set(self$velocity <- velocity, "ball.velocity")
             self$framerate = framerate
         },
         move_step = function(){
+            if(self$r$EXISTS("game.restart") && self$get("game.restart")==1){
+                self$set(self$position <- c(0.33,0,0), "ball.position")
+                self$set(self$velocity <- c(0,0,0), "ball.velocity")
+            }
+
             self$velocity = self$get("ball.velocity")
             self$position = self$position + self$velocity
             self$position[3] <- 0.5-abs(self$position[2]-0.5) # Not implementing gravity yet

@@ -8,3 +8,7 @@ if(whoami == "ball"){
 if(whoami == "player"){
   source("player.r")
 }
+
+if(whoami == "umpire"){
+  source("umpire.r")
+}

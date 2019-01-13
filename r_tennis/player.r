@@ -26,12 +26,10 @@ Player <- R6Class("Player",
             self$velocity = velocity
 
             self$set(self$position <- position, "player.me.position")
-            while(!self$r$EXISTS("ball.position")){
-                if(self$verbose>=1) print("Waiting for ball")
+            while(!self$r$EXISTS("game.status")){
                 Sys.sleep(1)
             }
-            while(!self$r$EXISTS(self$me_what("player.opp.position"))){
-                if(self$verbose>=1) print("Waiting for other player")
+            while(self$get("game.status")!="playing"){
                 Sys.sleep(1)
             }
             if(verbose>=1) print("Starting play")
@@ -39,6 +37,18 @@ Player <- R6Class("Player",
         move_step = function(){
             self$position = self$position + self$velocity
             self$set(self$position, "player.me.position")
+
+            if(self$get("game.restart")==1){
+                self$initialize(
+                    redis_conn = redux::hiredis(host = "redis"),
+                    framerate = 300,
+                    verbose = as.numeric(Sys.getenv("VERBOSE")),
+                    player_number = player_number,
+                    speed = 0.002,
+                    position = list(c(0.33, 0, 0), c(0.66, 1, 0))[[player_number]],
+                    velocity = c(0, 0, 0)
+                )
+            }
 
             if(
                 dist_from_ball <- dist(
@@ -57,7 +67,7 @@ Player <- R6Class("Player",
 
                 new_ball_velocity <- c(aim_position[1] - ball_position[1], aim_position[2] - ball_position[2], 0)
                     
-                #new_ball_velocity[1:2] <- new_ball_velocity[1:2] + rnorm(2)
+                new_ball_velocity[1:2] <- new_ball_velocity[1:2] + rnorm(2, sd = 0.1)
                 new_ball_velocity <- new_ball_velocity/sum(new_ball_velocity^2) # scale to speed=ball_speed
                 new_ball_velocity <- ball_speed*new_ball_velocity
                 self$set(new_ball_velocity, "ball.velocity")
