@@ -69,7 +69,7 @@ Player <- R6Class("Player",
                     
                 new_ball_velocity[1:2] <- new_ball_velocity[1:2] + rnorm(2, sd = 0.1)
                 new_ball_velocity <- new_ball_velocity/sum(new_ball_velocity^2) # scale to speed=ball_speed
-                new_ball_velocity <- ball_speed*new_ball_velocity
+                new_ball_velocity <- 0.002*new_ball_velocity
                 self$set(new_ball_velocity, "ball.velocity")
       
             }else{
@@ -83,7 +83,7 @@ Player <- R6Class("Player",
                 # start <- proc.start()
                 self$move_step()
                 # diff <- proc.stop() - stop
-                Sys.sleep(abs(1/framerate))# - diff))
+                Sys.sleep(abs(1/self$framerate))# - diff))
             }
         },
         me_what = function(what){

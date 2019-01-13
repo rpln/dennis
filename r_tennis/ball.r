@@ -36,7 +36,7 @@ Ball <- R6Class("Ball",
                 # start <- proc.start()
                 self$move_step()
                 # diff <- proc.stop() - stop
-                Sys.sleep(abs(1/framerate))# - diff))
+                Sys.sleep(abs(1/self$framerate))# - diff))
             }
         },
         set = function(x, what){

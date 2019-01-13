@@ -39,7 +39,7 @@ Umpire <- R6Class("Umpire",
                 # start <- proc.start()
                 self$watch_position()
                 # diff <- proc.stop() - stop
-                Sys.sleep(abs(1/framerate))# - diff))
+                Sys.sleep(abs(1/self$framerate))# - diff))
             }
         },
         watch_position = function(){
