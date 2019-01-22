@@ -9,6 +9,4 @@ RUN \
   install2.r redux jsonlite R6
 
 ADD \
-  tennis.r ball.r player.r umpire.r /
-
-CMD Rscript tennis.r
+  ball.r player.r umpire.r
