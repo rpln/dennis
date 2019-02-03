@@ -41,31 +41,76 @@ Player <- R6Class("Player",
             self$check_for_restart()
             if(
                 dist_from_ball <- dist(
-                    ball_position <- self$get("ball.position"),
-                    self$position
+                    (ball_position <- self$get("ball.position"))[1:2],
+                    self$position[1:2]
                 ) < 0.1
+                # only checking x and y for the moment, not z (height)
             ){
-                # Hit ball
-                self$velocity = c(0, 0, 0)
+                self$hit_ball(ball_position)
+            }else{
+                position_to_aim_at <- ball_position
+                position_to_aim_at[1] <- max(c(0,min(c(1,ball_position[1]))))
+                position_to_aim_at[2] <- c(
+                    max(c(0,min(c(0.1,ball_position[2])))),
+                    min(c(1,max(c(0.9,ball_position[2]))))
+                )[self$player_number]
+                position_to_aim_at[3] <- 0
+                self$velocity <- self$velocity_to_move_to_point(
+                    self$position, position_to_aim_at
+                )
+
+
+                
+            }
+        },
+        velocity_to_move_to_point = function(current_location, desired_location){
+            velocity <- c(
+                c(
+                    -self$speed, 
+                    self$speed
+                )[(desired_location[1] - current_location[1] > 0) + 1], 
+                0, 
+                0
+            )
+
+            return(velocity)
+        },
+        get_aim_position = function(){
                 opposition_position = self$get("player.opp.position")
-                aim_position <- c(
-                    c(0.25, 0.75)[(opposition_position[1]<0.5)+1],
-                    c(1, 0)[self$position[2]+1],
+            aim_position <- opposition_position
+            x_locs_to_try <- runif(5)
+            aim_position[1] <- x_locs_to_try[which.max(abs(x_locs_to_try - opposition_position[1]))]
+            return(aim_position)
+        },
+        estimate_ball_velocity_to_hit_aim_position = function(ball_position, aim_position){
+            new_ball_velocity <- c(
+                aim_position[1] - ball_position[1], 
+                aim_position[2] - ball_position[2], 
                     0
                 )
 
-                new_ball_velocity <- c(aim_position[1] - ball_position[1], aim_position[2] - ball_position[2], 0)
-                    
                 new_ball_velocity[1:2] <- new_ball_velocity[1:2] + rnorm(2, sd = 0.1)
                 new_ball_velocity <- new_ball_velocity/sum(new_ball_velocity^2) # scale to speed=ball_speed
                 new_ball_velocity <- 0.002*new_ball_velocity
-                self$set(new_ball_velocity, "ball.velocity")
-      
-            }else{
-                # Go closer to ball
-                self$velocity <- c(c(-self$speed, self$speed)[(ball_position[1] - self$position[1] > 0) + 1], 0, 0)
+            new_ball_velocity[3] <- 0.005
 
-            }
+            displacement <- aim_position - ball_position
+            theta <- pi/4
+            t <- sqrt(2*(abs(displacement[2]) - abs(displacement[3])*tan(theta)))/sqrt(tan(theta))
+            new_ball_velocity2 <- (displacement + c(0, 0, (t^2)/2)) / t
+            # cat("nbv1:", new_ball_velocity, "\n")
+            # cat("nbv2:", new_ball_velocity2, "\n")
+            return(new_ball_velocity2*0.0075)
+        },
+        hit_ball = function(ball_position){
+            self$velocity = c(0, 0, 0)
+            aim_position <- self$get_aim_position()
+            new_ball_velocity <- self$estimate_ball_velocity_to_hit_aim_position(ball_position, aim_position)
+                self$set(new_ball_velocity, "ball.velocity")
+            self$data <- list(
+                time = numeric(0),
+                ball_positions = list()
+            )
         },
         move_continuously = function(){
             while(1){
