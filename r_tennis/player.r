@@ -111,7 +111,7 @@ player = Player$new(
     framerate = 300,
     verbose = as.numeric(Sys.getenv("VERBOSE")),
     player_number = player_number,
-    speed = 0.002,
+    speed = 0.01,
     position = list(c(0.33, 0, 0), c(0.66, 1, 0))[[player_number]],
     velocity = c(0, 0, 0)
 )

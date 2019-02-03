@@ -27,7 +27,7 @@
     function set_ball_position(x, y, z) {
         ball.x = scale_x(x);
         ball.y = scale_y(y);
-        ball.z = scale_z(z)
+        ball.z = scale_z(z);
     }
 
     function set_player_1_position(x, y, z) {
