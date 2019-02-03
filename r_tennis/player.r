@@ -38,18 +38,7 @@ Player <- R6Class("Player",
             self$position = self$position + self$velocity
             self$set(self$position, "player.me.position")
 
-            if(self$get("game.restart")==1){
-                self$initialize(
-                    redis_conn = redux::hiredis(host = "redis"),
-                    framerate = 300,
-                    verbose = as.numeric(Sys.getenv("VERBOSE")),
-                    player_number = player_number,
-                    speed = 0.002,
-                    position = list(c(0.33, 0, 0), c(0.66, 1, 0))[[player_number]],
-                    velocity = c(0, 0, 0)
-                )
-            }
-
+            self$check_for_restart()
             if(
                 dist_from_ball <- dist(
                     ball_position <- self$get("ball.position"),
@@ -101,6 +90,19 @@ Player <- R6Class("Player",
             x <- jsonlite::fromJSON(self$r$GET(what))
             if(self$verbose>=2) cat("get", what, " ", x, "\n")
             return(x)
+        },
+        check_for_restart = function(){
+            if(self$get("game.restart")==1){
+                self$initialize(
+                    redis_conn = redux::hiredis(host = "redis"),
+                    framerate = 300,
+                    verbose = as.numeric(Sys.getenv("VERBOSE")),
+                    player_number = player_number,
+                    speed = 0.002,
+                    position = list(c(0.33, 0, 0), c(0.66, 1, 0))[[player_number]],
+                    velocity = c(0, 0, 0)
+                )
+            }
         }
     )
 )
