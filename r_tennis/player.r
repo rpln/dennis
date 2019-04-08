@@ -14,6 +14,10 @@ Player <- R6Class("Player",
         speed = NULL,
         velocity = NULL,
         opposition_player_number = NULL,
+        data = list(
+            time = numeric(0),
+            ball_positions = list()
+        ),
         initialize = function(redis_conn, framerate, position, player_number, speed, velocity, verbose = 1){
             self$verbose = verbose
             if(verbose>=1) print(paste0("I'm player ", player_number))
@@ -58,9 +62,23 @@ Player <- R6Class("Player",
                 self$velocity <- self$velocity_to_move_to_point(
                     self$position, position_to_aim_at
                 )
-
-
-                
+                self$velocity <- self$velocity_to_move_to_point2(
+                    self$position, position_to_aim_at
+                )
+                # cat("vtltp: ", test_velocity1, ", vtltp2: ", test_velocity2, "\n")
+                # if(runif(1) < 0.5){
+                    # cat(
+                    #     "eblp: ", 
+                    #     self$data$estimated_position <- 
+                    #         self$estimate_ball_landing_point(ball_position), 
+                    #     "\n"
+                    # )
+                    # if(self$player_number == 1){
+                    #     self$velocity <- test_velocity2 <- self$velocity_to_move_to_point2(
+                    #         self$position, c(self$data$estimated_position, 0)
+                    #     )
+                    # }
+                # }
             }
         },
         velocity_to_move_to_point = function(current_location, desired_location){
@@ -75,8 +93,43 @@ Player <- R6Class("Player",
 
             return(velocity)
         },
+        velocity_to_move_to_point2 = function(current_location, desired_location){
+            translation <- desired_location - current_location
+            velocity <- translation
+            velocity[3] <- 0
+            velocity <- (velocity*self$speed) / sqrt(sum(velocity^2))
+
+            return(velocity)
+        },
+        estimate_ball_landing_point = function(ball_position){
+            self$data$time = c(self$data$time, as.numeric(proc.time()[3]))
+            self$data$ball_positions[[length(self$data$ball_positions)+1]] = ball_position
+            predicted_position <- self$position[1:2]
+            if(length(self$data$time)>4){
+                cat("_")
+                df <- data.frame(
+                    t = self$data$time, 
+                    x = sapply(self$data$ball_positions, function(x) x[1]),
+                    y = sapply(self$data$ball_positions, function(x) x[2]),
+                    z = sapply(self$data$ball_positions, function(x) x[3])
+                )
+                time_model <- coef(lm(z ~ t + I(t^2), data = df))
+                names(time_model) <- c("c", "b", "a")
+                time_to_hit_ground <- with(as.list(time_model), max((-b + c(-1, 1)*sqrt(b^2 - 4*a*c))/(2*a)))
+                
+                position_model <- lm(cbind(x, y) ~ t, data = df)
+                new_predicted_position <- as.numeric(
+                    predict(position_model, newdata = data.frame(t = time_to_hit_ground))
+                )
+                if(all(is.finite(new_predicted_position))){
+                    cat("_")
+                    predicted_position <- new_predicted_position
+                }
+            }
+            return(predicted_position)
+        },
         get_aim_position = function(){
-                opposition_position = self$get("player.opp.position")
+            opposition_position = self$get("player.opp.position")
             aim_position <- opposition_position
             x_locs_to_try <- runif(5)
             aim_position[1] <- x_locs_to_try[which.max(abs(x_locs_to_try - opposition_position[1]))]
@@ -86,12 +139,12 @@ Player <- R6Class("Player",
             new_ball_velocity <- c(
                 aim_position[1] - ball_position[1], 
                 aim_position[2] - ball_position[2], 
-                    0
-                )
+                0
+            )
 
-                new_ball_velocity[1:2] <- new_ball_velocity[1:2] + rnorm(2, sd = 0.1)
-                new_ball_velocity <- new_ball_velocity/sum(new_ball_velocity^2) # scale to speed=ball_speed
-                new_ball_velocity <- 0.002*new_ball_velocity
+            new_ball_velocity[1:2] <- new_ball_velocity[1:2] + rnorm(2, sd = 0.1)
+            new_ball_velocity <- new_ball_velocity/sum(new_ball_velocity^2) # scale to speed=ball_speed
+            new_ball_velocity <- 0.002*new_ball_velocity
             new_ball_velocity[3] <- 0.005
 
             displacement <- aim_position - ball_position
@@ -106,7 +159,7 @@ Player <- R6Class("Player",
             self$velocity = c(0, 0, 0)
             aim_position <- self$get_aim_position()
             new_ball_velocity <- self$estimate_ball_velocity_to_hit_aim_position(ball_position, aim_position)
-                self$set(new_ball_velocity, "ball.velocity")
+            self$set(new_ball_velocity, "ball.velocity")
             self$data <- list(
                 time = numeric(0),
                 ball_positions = list()

@@ -25,8 +25,8 @@ Ball <- R6Class("Ball",
                 self$set(self$position <- c(0.33,0,0), "ball.position")
                 self$set(self$velocity <- c(0,0,0), "ball.velocity")
             }else{
-            self$velocity = self$get("ball.velocity")
-            self$position = self$position + self$velocity
+                self$velocity = self$get("ball.velocity")
+                self$position = self$position + self$velocity
                 if(self$position[3] < 0){
                     if(self$velocity[3] < 0){
                         self$velocity[3] <- -self$velocity[3] * 1 # coefficient of restitution
@@ -37,7 +37,7 @@ Ball <- R6Class("Ball",
                     self$velocity[3] <- self$velocity[3] - 0.02/self$framerate # accelaration due to gravity
                 }
                 self$set(self$velocity, "ball.velocity")
-            self$set(self$position, "ball.position")
+                self$set(self$position, "ball.position")
             }
         },
         move_continuously = function(){
