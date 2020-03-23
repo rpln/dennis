@@ -15,7 +15,6 @@ http.listen(8000, function(){
   console.log('listening on *:8000');
 });
 
-
 var redis = require("redis"),
     client = redis.createClient({host: 'redis'});
 

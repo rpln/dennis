@@ -52,6 +52,7 @@ Umpire <- R6Class("Umpire",
             self$set(1, "game.restart")
             self$start_game()
         },
+        # setting and getting from redis
         set = function(x, what){
             self$r$SET(what, jsonlite::toJSON(x))
             if(self$verbose>=2) cat("set", what, " ", x, "\n")

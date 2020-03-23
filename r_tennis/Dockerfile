@@ -8,5 +8,10 @@ RUN \
 RUN \
   install2.r redux jsonlite R6
 
+RUN \
+  mkdir -p /app/r_tennis
+
+WORKDIR /app/r_tennis
+
 ADD \
-  ball.r player.r umpire.r /
+  ball.r player.r umpire.r /app/r_tennis/

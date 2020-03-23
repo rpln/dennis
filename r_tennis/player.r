@@ -178,6 +178,7 @@ Player <- R6Class("Player",
             what = sub("player.opp", paste0("player.", self$opposition_player_number), what)
             return(what)
         },
+        # setting and getting from redis
         set = function(x, what){
             what = self$me_what(what)
             if(self$verbose>=2) cat("set", what, " ", x, "\n")

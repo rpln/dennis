@@ -48,6 +48,7 @@ Ball <- R6Class("Ball",
                 Sys.sleep(abs(1/self$framerate))# - diff))
             }
         },
+        # setting and getting from redis
         set = function(x, what){
             self$r$SET(what, jsonlite::toJSON(x))
             if(self$verbose>=2) cat("set", what, " ", x, "\n")
