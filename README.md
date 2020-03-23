@@ -1,6 +1,6 @@
-### Docker tennis: Dennis
+# Docker tennis: Dennis
 
-The tennis game consists of:
+#### The tennis game consists of:
 * Environment: An environment that tracks the state of the game
 * Camera: Capturing the state of the environment
 * Viewer: Allows observing the environment that camera has captured
@@ -8,7 +8,7 @@ The tennis game consists of:
 * Ball: Behaving as a ball should
 * Players: At least two players that aim to win the tennis game
 
-Structure of each component:
+#### Structure of each component:
 * Environment
   * Simple an initially empty redis
 * Camera
@@ -49,7 +49,7 @@ Structure of each component:
       * `estimate_ball_landing_point()`
     * `check_for_restart()`
 
-Improvements planned:
+#### Improvements planned:
 * Weather which may include
   * Wind - that would affect ball trajectories
   * Rain - that would affect player grip
