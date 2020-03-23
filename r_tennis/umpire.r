@@ -1,18 +1,13 @@
-library(R6)
+source("tennis.r")
 
 Umpire <- R6Class("Umpire",
+    inherit = Tennis,
     public = list(
-        verbose = NULL,
-        r = NULL,
-        framerate = NULL,
         position = NULL,
         velocity = NULL,
         initialize = function(redis_conn, framerate, verbose = 1){
-            self$verbose = verbose
+            super$initialize(redis_conn, framerate, verbose)
             if(verbose>=1) print("I'm the umpire")
-
-            self$r = redis_conn
-            self$framerate = framerate
         },
         start_game = function(){
             while(!self$r$EXISTS("ball.position")){
@@ -51,16 +46,6 @@ Umpire <- R6Class("Umpire",
         new_game = function(){
             self$set(1, "game.restart")
             self$start_game()
-        },
-        # setting and getting from redis
-        set = function(x, what){
-            self$r$SET(what, jsonlite::toJSON(x))
-            if(self$verbose>=2) cat("set", what, " ", x, "\n")
-        },
-        get = function(what){
-            x <- jsonlite::fromJSON(self$r$GET(what))
-            if(self$verbose>=2) cat("get", what, " ", x, "\n")
-            return(x)
         }
     )
 )

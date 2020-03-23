@@ -1,14 +1,8 @@
-library(R6)
-
-dist = function(location_1, location_2){
-  sqrt(sum((location_1 - location_2)^2))
-}
+source("tennis.r")
 
 PlayerBasic <- R6Class("PlayerBasic",
+    inherit = Tennis,
     public = list(
-        verbose = NULL,
-        r = NULL,
-        framerate = NULL,
         position = NULL,
         player_number = NULL,
         speed = NULL,
@@ -21,11 +15,10 @@ PlayerBasic <- R6Class("PlayerBasic",
         ),
         initialize = function(redis_conn, framerate, position, player_number, 
                               speed, velocity, min_dist_to_hit_ball, verbose = 1){
-            self$verbose = verbose
+            super$initialize(redis_conn, framerate, verbose)
+
             if(verbose>=1) print(paste0("I'm player ", player_number))
 
-            self$r = redis_conn
-            self$framerate = framerate
             self$player_number = player_number
             self$opposition_player_number = 3 - player_number
             self$speed = speed
@@ -123,28 +116,24 @@ PlayerBasic <- R6Class("PlayerBasic",
         },
         move_continuously = function(){
             while(1){
-                # start <- proc.start()
+                start <- proc.time()
                 self$move_step()
-                # diff <- proc.stop() - stop
-                Sys.sleep(abs(1/self$framerate))# - diff))
+                diff <- proc.time() - start
+                Sys.sleep(abs(1/self$framerate - diff['elapsed']))
             }
         },
+
+        # Prefixing redis object names with player numbers
         me_what = function(what){
             what = sub("player.me", paste0("player.", self$player_number), what)
             what = sub("player.opp", paste0("player.", self$opposition_player_number), what)
             return(what)
         },
-        # setting and getting from redis
         set = function(x, what){
-            what = self$me_what(what)
-            if(self$verbose>=2) cat("set", what, " ", x, "\n")
-            self$r$SET(what, jsonlite::toJSON(x))
+            super$set(x, self$me_what(what))
         },
         get = function(what){
-            what = self$me_what(what)
-            x <- jsonlite::fromJSON(self$r$GET(what))
-            if(self$verbose>=2) cat("get", what, " ", x, "\n")
-            return(x)
+            super$get(self$me_what(what))
         },
         check_for_restart = function(){
             if(self$get("game.restart")==1){

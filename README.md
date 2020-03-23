@@ -61,4 +61,3 @@ Improvements planned:
 * Collect history of games
   * Either by [redis](https://redis.io/topics/persistence) or by camera
 * Add proper score tracking
-* Abstract class for R code to reduce duplication of methods

@@ -1,24 +1,21 @@
-library(R6)
+source("tennis.r")
 
 Ball <- R6Class("Ball",
+    inherit = Tennis,
     public = list(
-        verbose = NULL,
-        r = NULL,
-        framerate = NULL,
         position = NULL,
         velocity = NULL,
         initialize = function(redis_conn, framerate, position, velocity, verbose = 1){
-            self$verbose = verbose
+            super$initialize(redis_conn, framerate, verbose)
+
             if(verbose>=1) print("I'm a ball")
 
-            self$r = redis_conn
             for(i in list(c(0,0,0.1), c(0,1,0.1), c(1,1,0.1), c(1,0,0.1))){
                 self$set(i, "ball.position")
                 Sys.sleep(1)
             }
             self$set(self$position <- position, "ball.position")
             self$set(self$velocity <- velocity, "ball.velocity")
-            self$framerate = framerate
         },
         move_step = function(){
             if(self$r$EXISTS("game.restart") && self$get("game.restart")==1){
@@ -47,16 +44,6 @@ Ball <- R6Class("Ball",
                 # diff <- proc.stop() - stop
                 Sys.sleep(abs(1/self$framerate))# - diff))
             }
-        },
-        # setting and getting from redis
-        set = function(x, what){
-            self$r$SET(what, jsonlite::toJSON(x))
-            if(self$verbose>=2) cat("set", what, " ", x, "\n")
-        },
-        get = function(what){
-            x <- jsonlite::fromJSON(self$r$GET(what))
-            if(self$verbose>=2) cat("get", what, " ", x, "\n")
-            return(x)
         }
     )
 )
