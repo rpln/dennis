@@ -25,11 +25,11 @@
       * `watch_position()`
     * `new_game()`
 * Ball
-  * Currently implemented in R
+  * Currently implemented in Go and R (default = Go)
     * `move_step()`
     * `move_continuously()`
 * Players
-  * Currently implemented in R
+  * Currently implemented in Python and R (default = Python vs. R)
     * `PlayerBasic()`
       * `move_step()`
       * `velocity_to_move_to_point()`
@@ -44,14 +44,28 @@
     * `check_for_restart()`
 
 #### Improvements planned:
-* Weather which may include
-  * Wind - that would affect ball trajectories
-  * Rain - that would affect player grip
-  * Sun - that would affect player accuracy if it glares in a player's face
-* Ensure that players communicate with ball, and not the environment (redis) when hitting the ball
-* Python player
-* Golang ball
-* Split R player into basic player and advanced player
-* Collect history of games
-  * Either by [redis](https://redis.io/topics/persistence) or by camera
-* Add proper score tracking
+* Core application
+  * Improve the players, they are very simple at the moment
+  * Collect history of games to understand and improve players
+    * Either by [redis](https://redis.io/topics/persistence) or by camera
+  * Add proper score tracking
+  * Ensure that players communicate with ball, and not the environment (redis) when hitting the ball
+    * Requires a ball API
+* Graphics
+  * 3D, either through a pseudo [2dcanvas transformation](https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas) or actual 3D
+  * Graphs/charts displaying latest state and historical stats; e.g. player energy levels, scoring, ...
+* Player learning
+  * Factors to include to make things interesting
+    * Weather which may include
+      * Wind - that would affect ball trajectories
+      * Rain - that would affect player grip
+      * Sun - that would affect player accuracy if it glares in a player's face
+    * Biology
+      * A player can run faster, but this uses energy
+      * Accuracy can be impacted by energy of player, speed of player, distance from ball, speed of ball
+  * Things to predict (resulting in features in a model)
+    * Is the ball going to land in or out?
+    * Where is the ball going to land precisely?
+    * Even if the ball is going to land in the court, is it worth wasting the energy to run for it?
+* Deployment
+  * Use kubernetes to demonstrate scaling (e.g. a healthcheck could fail if a set is lost, then an additional player is spawned to help out)
