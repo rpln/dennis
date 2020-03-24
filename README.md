@@ -1,4 +1,10 @@
-# Docker tennis: Dennis
+# Docker tennis: _Dennis_
+
+```
+docker-compose up
+```
+
+Then browse to [localhost:8000](http://localhost:8000) to view the tennis match
 
 #### The tennis game consists of:
 * Environment: An environment that tracks the state of the game
