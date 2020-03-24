@@ -39,10 +39,11 @@ Ball <- R6Class("Ball",
         },
         move_continuously = function(){
             while(1){
-                # start <- proc.start()
+                start <- proc.time()
                 self$move_step()
-                # diff <- proc.stop() - stop
-                Sys.sleep(abs(1/self$framerate))# - diff))
+                diff <- proc.time() - start
+                # Sys.sleep(abs(1/self$framerate))
+                Sys.sleep(abs(1/self$framerate - diff['elapsed']))
             }
         }
     )

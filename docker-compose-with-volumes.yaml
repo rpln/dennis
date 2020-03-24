@@ -11,38 +11,38 @@ services:
     command: Rscript umpire.r
     volumes:
     - ./r_tennis:/app/r_tennis
-  r_ball_1:
+  go_ball_1:
     build:
-      context: r_tennis
+      context: go_tennis
     environment:
       - VERBOSE=1
     depends_on:
       - redis
-    command: Rscript ball.r
+    command: go run ball.go
     volumes:
-    - ./r_tennis:/app/r_tennis
+    - ./go_tennis:/app/go_tennis
   r_player_1:
     build:
       context: r_tennis
     environment:
       - MYNUMBER=1
-      - VERBOSE=1
+      - VERBOSE=0
     depends_on:
       - redis
     command: Rscript player.r
     volumes:
     - ./r_tennis:/app/r_tennis
-  r_player_2:
+  python_player_2:
     build:
-      context: r_tennis
-    environment:
+      context: python_tennis
+    environment: 
       - MYNUMBER=2
       - VERBOSE=1
     depends_on:
       - redis
-    command: Rscript player.r
+    command: python player.py
     volumes:
-    - ./r_tennis:/app/r_tennis
+    - ./python_tennis:/app/python_tennis
   redis:
     image: redis
     environment:

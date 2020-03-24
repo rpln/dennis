@@ -5,7 +5,7 @@ PlayerBasic <- R6Class("PlayerBasic",
     public = list(
         position = NULL,
         player_number = NULL,
-        speed = NULL,
+        max_speed = NULL,
         velocity = NULL,
         min_dist_to_hit_ball = NULL,
         opposition_player_number = NULL,
@@ -14,14 +14,14 @@ PlayerBasic <- R6Class("PlayerBasic",
             ball_positions = list()
         ),
         initialize = function(redis_conn, framerate, position, player_number, 
-                              speed, velocity, min_dist_to_hit_ball, verbose = 1){
+                              max_speed, velocity, min_dist_to_hit_ball, verbose = 1){
             super$initialize(redis_conn, framerate, verbose)
 
             if(verbose>=1) print(paste0("I'm player ", player_number))
 
             self$player_number = player_number
             self$opposition_player_number = 3 - player_number
-            self$speed = speed
+            self$max_speed = max_speed
             self$velocity = velocity
             self$min_dist_to_hit_ball = min_dist_to_hit_ball
 
@@ -66,8 +66,8 @@ PlayerBasic <- R6Class("PlayerBasic",
         velocity_to_move_to_point = function(current_location, desired_location){
             velocity <- c(
                 c(
-                    -self$speed, 
-                    self$speed
+                    -self$max_speed, 
+                    self$max_speed
                 )[(desired_location[1] - current_location[1] > 0) + 1], 
                 0, 
                 0
@@ -142,9 +142,10 @@ PlayerBasic <- R6Class("PlayerBasic",
                     framerate = 300,
                     verbose = as.numeric(Sys.getenv("VERBOSE")),
                     player_number = player_number,
-                    speed = 0.002,
+                    max_speed = 0.002,
                     position = list(c(0.33, 0, 0), c(0.66, 1, 0))[[player_number]],
-                    velocity = c(0, 0, 0)
+                    velocity = c(0, 0, 0),
+                    min_dist_to_hit_ball = 0.1
                 )
             }
         }
@@ -159,7 +160,7 @@ Player <- R6Class("Player",
             translation <- desired_location - current_location
             velocity <- translation
             velocity[3] <- 0
-            velocity <- (velocity*self$speed) / sqrt(sum(velocity^2))
+            velocity <- (velocity*self$max_speed) / sqrt(sum(velocity^2))
 
             return(velocity)
         },
@@ -194,12 +195,12 @@ Player <- R6Class("Player",
 )
 
 player_number = as.numeric(Sys.getenv("MYNUMBER"))
-player = Player$new(
+player = PlayerBasic$new(
     redis_conn = redux::hiredis(host = "redis"),
     framerate = 300,
     verbose = as.numeric(Sys.getenv("VERBOSE")),
     player_number = player_number,
-    speed = 0.01,
+    max_speed = 0.01,
     position = list(c(0.33, 0, 0), c(0.66, 1, 0))[[player_number]],
     velocity = c(0, 0, 0),
     min_dist_to_hit_ball = 0.1

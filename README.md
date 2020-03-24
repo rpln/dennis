@@ -24,14 +24,10 @@
     * `watch_game()`
       * `watch_position()`
     * `new_game()`
-    * `set()`
-    * `get()`
 * Ball
   * Currently implemented in R
     * `move_step()`
     * `move_continuously()`
-    * `set()`
-    * `get()`
 * Players
   * Currently implemented in R
     * `PlayerBasic()`
@@ -41,8 +37,6 @@
       * `move_to_ball()`
       * `move_continuously()`
       * `me_what()`
-      * `set()`
-      * `get()`
     * `Player()`
       * `get_aim_position()`
       * `estimate_ball_velocity_to_hit_aim_position()`
