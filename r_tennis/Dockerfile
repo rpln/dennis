@@ -14,4 +14,4 @@ RUN \
 WORKDIR /app/r_tennis
 
 ADD \
-  ball.r player.r umpire.r /app/r_tennis/
+  *.r /app/r_tennis/

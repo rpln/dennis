@@ -57,4 +57,4 @@ services:
     environment:
       - NODE_PATH=/usr/local/lib/node_modules
     volumes:
-    - ./node_server:/app/node_server
+    - ./node_tennis:/app/node_server
